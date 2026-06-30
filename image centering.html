@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        #sn{
+            display: block;
+            margin: auto;
+            width: 300px;
+        }
+        div{
+            display: flex;
+            justify-content: center;
+        }
+       #CK{
+            width: 400px;
+        }
+
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>image centering</title>
+</head>
+<body>
+    <h1>usingmargin</h1>
+    <img src="images/image.png" alt="snekers" id="sn">
+    <br>
+    <br>
+    <br>        
+    <div>
+        <img src="images/img 1.jpg" alt="cooking" id="CK">
+    </div>
+    <div id="team-list"></div>
+
+<script>
+  const footballteams = ["burnley", "wolves", "brentford", "real madrid", "atletico madrid"];
+  let text = "";
+  
+  for (let f = 0; f < footballteams.length; f++) {
+    text += footballteams[f] + "<br>";
+  }
+  
+  // Inject the text string into the HTML div
+  document.getElementById("team-list").innerHTML = text;
+</script>
+</body>
+</html>
