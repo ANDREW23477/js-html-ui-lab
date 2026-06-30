@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p id="qwert"></p>
+
+    <script>
+        const footballteams = ["burnley", "wolves", 
+        "brentford",
+         "real madrid", "atletico madrid"];
+let ft = footballteams.length;
+document.write(footballteams.length)
+let text = "";
+for (let f = 0; f < footballteams.length; f++) {
+  text += footballteams[f] + "<br>";
+}
+document.getElementById("qwert").innerHTML = text;
+    </script>
+    <br>
+    <p id="zxcv"></p>
+    <script>
+        let textt = "";
+
+let i = 0;
+while (i < 10) {
+  textt += "The number is " + i + "<br>";
+  i++;
+}
+
+document.getElementById("zxcv").innerHTML = textt;
+    </script>
+</body>
+</html>
