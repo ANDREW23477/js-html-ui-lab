@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Desking Planner for Expanded Workstation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #d612b5;
+      margin-bottom: 5px;
+    }
+    p {
+      color: #9c1818;
+      margin-bottom: 12px;
+    }
+    .controls {
+      margin-bottom: 12px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 15px;
+      border:solid;
+      border-radius: 6px;
+      background-color: #91ee17;
+      color: rgb(216, 17, 206);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    /* Grid container for the office desks */
+    .office-floor {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 17px;
+      max-width: 550px;
+      width: 100%;
+      background: rgb(206, 22, 22);
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(216, 133, 205, 0.1);
+    }
+    /* Individual desk styling */
+    .desk {
+      aspect-ratio: 1;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+      text-align: center;
+      padding: 5px;
+      font-size: 12px;
+    }
+    /* Desk states */
+    .desk.available {
+      background-color: #e2f0d9;
+      border-color: #a9d18e;
+      color: #385723;
+    }
+    .desk.available:hover {
+      background-color: #c2e464;
+      transform: scale(1.05);
+    }
+    .desk.booked {
+      background-color: #fce4d6;
+      border-color: #f8cbad;
+      color: #921cc9;
+      cursor: not-allowed;
+    }
+    .desk-label {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .user-name {
+      font-weight: bold;
+      font-style: oblique;
+    }
+    .in{
+       background-color: #e2f0d9;
+      border-color: #a9d18e;
+      color: #385723;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>EXPANDED WORKSTATION DESK PLANNER</h1>
+  <p>Click on an empty desk to reserve it. Refreshing the page will keep your bookings intact!</p>
+  <a href="index2.html" class="in">Hand over your phone, email, and age, and a shiny desk is yours!</a>
+
+  <div class="controls">
+    <button id="reset-btn">Restore the Desks</button>
+  </div>
+
+  <!-- The visual layout grid -->
+  <div class="office-floor" id="floor-plan"></div>
+
+  <script>
+    const TOTAL_DESKS = 40;
+    const floorPlan = document.getElementById('floor-plan');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // Retrieve previous bookings from LocalStorage, or initialize empty array
+    let bookings = JSON.parse(localStorage.getItem('officeBookings')) || {};
+
+    // Generate the desks on the page
+    function createOfficeFloor() {
+      floorPlan.innerHTML = ''; // get rid of current grid
+
+      for (let i = 1; i <= TOTAL_DESKS; i++) {
+        const desk = document.createElement('div');
+        desk.classList.add('desk');
+
+        // Check if a desk is booked
+        if (bookings[i]) {
+          desk.classList.add('booked');
+          desk.innerHTML = `
+            <div class="desk-label">Desk ${i}</div>
+            <div class="user-name">${bookings[i]}</div>
+          `;
+        } else {
+          desk.classList.add('available');
+          desk.innerHTML = `
+            <div class="desk-label">Desk ${i}</div>
+            <div class="user-name">Available</div>
+          `;
+          // Add click listener  to available desks.
+          desk.addEventListener('click', () => bookDesk(i));
+        }
+
+        floorPlan.appendChild(desk);
+      }
+    }
+
+    // Process a desk booking
+    function bookDesk(deskNumber) {
+      const userName = prompt(`Enter your name to reserve Desk ${deskNumber}:`);
+      if (userName && userName.trim() !== "") {
+        bookings[deskNumber] = userName.trim();
+        localStorage.setItem('officeBookings', JSON.stringify(bookings));
+        createOfficeFloor(); // Re-render floor plan
+      }
+    }
+
+    // Clear the bookings
+    resetBtn.addEventListener('click', () => {
+      if (confirm("Are you sure you want to clear all reservations?")) {
+        bookings = {};
+        localStorage.removeItem('officeBookings');
+        createOfficeFloor();
+      }
+    });
+
+    // Initialize the application on load
+    createOfficeFloor();
+  </script>
+</body>
+</html>
+<!-- Locate this section in your body ---->
+<div class="controls">
+  <button id="reset-btn">Reset all the Desks</button>
+  
+  <!-- ADD THIS LINE HERE: -->
+  <input type="text" id="search-input" placeholder="Search by name..." style="padding: 9px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; margin-left: 10px; width: 180px;">
+</div>
+  </script>
+</body>
+</html>
+
