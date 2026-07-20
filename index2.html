@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Hot-Desking Planner</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #dd0bcc;
+      margin-bottom: 5px;
+    }
+    p {
+      color: #9c1818;
+      margin-bottom: 12px;
+    }
+    .controls {
+      margin-bottom: 12px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      background-color: #91ee17;
+      color: rgb(209, 39, 201);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    /* Grid container for the office desks */
+    .office-floor {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 17px;
+      max-width: 550px;
+      width: 100%;
+      background: rgb(201, 14, 14);
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    /* Individual desk styling */
+    .desk {
+      aspect-ratio: 1;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+      text-align: center;
+      padding: 5px;
+      font-size: 12px;
+      position: relative;
+    }
+    /* Desk states */
+    .desk.available {
+      background-color: #e2f0d9;
+      border-color: #a9d18e;
+      color: #385723;
+    }
+    .desk.available:hover {
+      background-color: #c5e0b4;
+      transform: scale(1.05);
+    }
+    .desk.booked {
+      background-color: #fce4d6;
+      border-color: #f8cbad;
+      color: #c65911;
+    }
+    .desk-label {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .user-name {
+      font-weight: bold;
+      font-style: oblique;
+    }
+
+    /* Modal Pop-up Background styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none; /* Hidden by default */
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    /* Modal Form Box styling */
+    .modal-box {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 350px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .modal-box h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .cancel-btn {
+      background-color: #6c757d;
+    }
+    .cancel-btn:hover {
+      background-color: #5a6268;
+    }
+    .in{
+       background-color: #e2f0d9;
+      border-color: #a9d18e;
+      color: #385723;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>EXPANDED WORKSTATION DESK PLANNER</h1>
+  <p>Click an available desk to reserve it. go through to scan booked desks to see more info..</p>
+  <a href="index3.html">Line up your co-worker’s code/badge. Be quick before they run off for coffee!</a>
+  <a href="index.html" class="in">BACK</a>
+  <div class="controls">
+    <button id="reset-btn">Reboot All Desks</button>
+    <input type="text" id="search-input" placeholder="Search by name..." style="padding: 9px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; margin-left: 10px; width: 180px;">
+  </div>
+
+  <!-- The visual layout grid -->
+  <div class="office-floor" id="floor-plan"></div>
+
+  <!-- Live Attendance list block -->
+  <div style="margin-top: 25px; max-width: 500px; width: 100%; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;">
+    <h3 style="margin-top: 0; color: #333;">Live Attendance (<span id="booked-count">0</span>/12 Booked)</h3>
+    <ul id="attendance-list" style="list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto;">
+      <!-- JavaScript will insert the list of people here -->
+    </ul>
+  </div>
+
+  <!-- POP-UP BOOKING FORM (MODAL) -->
+  <div class="modal-overlay" id="booking-modal">
+    <div class="modal-box">
+      <h3 id="modal-title">Book Desk</h3>
+      <form id="booking-form">
+        <!-- Hidden input to track which desk is being clicked -->
+        <input type="hidden" id="modal-desk-id">
+        
+        <div class="form-group">
+          <label for="user-name">Full Name *</label>
+          <input type="text" id="user-name" required placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label for="user-email">Email Address *</label>
+          <input type="email" id="user-email" required placeholder="john@company.com">
+        </div>
+        <div class="form-group">
+          <label for="user-phone">Contact Number *</label>
+          <input type="tel" id="user-phone" required placeholder="555-0199">
+        </div>
+        <div class="form-group">
+          <label for="user-age">Age</label>
+          <input type="number" id="user-age" min="18" max="100" placeholder="28">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" id="close-modal-btn">Cancel</button>
+          <button type="submit">Confirm Booking</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_DESKS = 40;
+    const floorPlan = document.getElementById('floor-plan');
+    const resetBtn = document.getElementById('reset-btn');
+    const searchInput = document.getElementById('search-input');
+    
+    // Modal Element references
+    const bookingModal = document.getElementById('booking-modal');
+    const bookingForm = document.getElementById('booking-form');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDeskId = document.getElementById('modal-desk-id');
+
+    // Retrieve previous bookings from LocalStorage, or initialize empty object
+    // Note: Instead of containing just strings, this now stores objects: { "1": { name, email, phone, age } }
+    let bookings = JSON.parse(localStorage.getItem('officeBookings')) || {};
+
+    // Generate/render the floor plan and the updated attendance sidebar
+    function createOfficeFloor() {
+      floorPlan.innerHTML = ''; 
+      const attendanceList = document.getElementById('attendance-list');
+      const bookedCountSpan = document.getElementById('booked-count');
+      
+      attendanceList.innerHTML = ''; 
+      let bookedCount = 0;
+
+      for (let i = 1; i <= TOTAL_DESKS; i++) {
+        const desk = document.createElement('div');
+        desk.classList.add('desk');
+        desk.setAttribute('data-desk-id', i);
+
+        // Check if desk has already been booked
+        if (bookings[i]) {
+          bookedCount++;
+          const user = bookings[i]; // This is now an object!
+          desk.classList.add('booked');
+          
+          desk.innerHTML = `
+            <div class="desk-label">Desk ${i}</div>
+            <div class="user-name">${user.name}</div>
+          `;
+          
+          // Add detailed descriptive browser tooltip on hover
+          desk.title = `Email: ${user.email}\nPhone: ${user.phone}\nAge: ${user.age || 'N/A'}`;
+
+          // Create dynamic list entry for the live attendance panel
+          const li = document.createElement('li');
+          li.style.cssText = "padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; font-size: 13px; line-height: 1.5;";
+          
+          li.innerHTML = `
+            <div style="display: flex; justify-content: space-between; font-weight: bold;">
+              <span>👤 ${user.name} (Age: ${user.age || 'N/A'})</span>
+              <span style="color: #007bff;">Desk ${i}</span>
+            </div>
+            <div style="color: #666; font-size: 11px; margin-top: 3px;">
+              ✉️ ${user.email} | 📞 ${user.phone}
+            </div>
+          `;
+          
+          li.onmouseover = () => li.style.backgroundColor = "#f0f4f8";
+          li.onmouseout = () => li.style.backgroundColor = "transparent";
+
+          // Clicking list item highlights the corresponding desk
+          li.addEventListener('click', () => {
+            const targetDesk = document.querySelector(`[data-desk-id="${i}"]`);
+            targetDesk.style.transform = "scale(1.1)";
+            targetDesk.style.borderColor = "#007bff";
+            targetDesk.style.boxShadow = "0 0 10px rgba(0,123,255,0.5)";
+            
+            setTimeout(() => {
+              targetDesk.style.transform = "none";
+              targetDesk.style.borderColor = "#f8cbad";
+              targetDesk.style.boxShadow = "none";
+            }, 1500);
+          });
+
+          attendanceList.appendChild(li);
+
+        } else {
+          desk.classList.add('available');
+          desk.innerHTML = `
+            <div class="desk-label">Desk ${i}</div>
+            <div class="user-name">Available</div>
+          `;
+          desk.addEventListener('click', () => openBookingModal(i));
+        }
+
+        floorPlan.appendChild(desk);
+      }
+
+      bookedCountSpan.textContent = bookedCount;
+
+      if (bookedCount === 0) {
+        attendanceList.innerHTML = `<li style="color: #999; font-style: italic; padding: 10px 0; text-align: center;">No desks booked yet for today.</li>`;
+      }
+    }
+
+    // Modal Control Functions
+    function openBookingModal(deskNumber) {
+      modalTitle.textContent = `Book Desk ${deskNumber}`;
+      modalDeskId.value = deskNumber;
+      bookingModal.style.display = 'flex'; // Show modal
+    }
+
+    function closeBookingModal() {
+      bookingForm.reset(); // Clear input fields
+      bookingModal.style.display = 'none'; // Hide modal
+    }
+
+    closeModalBtn.addEventListener('click', closeBookingModal);
+
+    // Save bookings when form is submitted
+    bookingForm.addEventListener('submit', (e) => {
+      e.preventDefault(); // Stop standard form page-refresh
+      
+      const deskId = modalDeskId.value;
+      
+      // Save data under a single organized object
+      bookings[deskId] = {
+        name: document.getElementById('user-name').value.trim(),
+        email: document.getElementById('user-email').value.trim(),
+        phone: document.getElementById('user-phone').value.trim(),
+        age: document.getElementById('user-age').value.trim()
+      };
+
+      localStorage.setItem('officeBookings', JSON.stringify(bookings));
+      closeBookingModal();
+      createOfficeFloor(); // Re-render floor plan and list
+    });
+
+    // Real-time search filter matching names
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      const desks = document.querySelectorAll('.desk');
+
+      desks.forEach((desk, index) => {
+        const deskNumber = index + 1;
+        const user = bookings[deskNumber];
+
+        if (searchTerm === "") {
+          desk.style.opacity = "1";
+          desk.style.borderWidth = "2px";
+          return;
+        }
+
+        // Search against the name attribute inside our booking object
+        if (user && user.name.toLowerCase().includes(searchTerm)) {
+          desk.style.opacity = "1";
+          desk.style.borderWidth = "4px"; 
+        } else {
+          desk.style.opacity = "0.3";
+          desk.style.borderWidth = "2px";
+        }
+      });
+    });
+
+    // Clear all bookings
+    resetBtn.addEventListener('click', () => {
+      if (confirm("Are you sure you want to clear all reservations?")) {
+        bookings = {};
+        localStorage.removeItem('officeBookings');
+        createOfficeFloor();
+      }
+    });
+
+    // Initialize layout on launch
+    createOfficeFloor();
+  </script>
+  <script>
+    /* BEFORE (just a name string) */
+bookings["1"] = "John Doe";
+
+/* AFTER (an structured details object) */
+bookings["1"] = {
+  name: "John Doe",
+  email: "john@company.com",
+  phone: "555-0199",
+  age: "28"
+};
+  </script>
+</body>
+</html>

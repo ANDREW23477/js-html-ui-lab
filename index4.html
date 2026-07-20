@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desk Planner - Project Sign-Off</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f4f6f8; margin: 0; }
+    .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 32px; max-width: 420px; width: 100%; text-align: center; }
+    .badge { background: #ebedee; color: #e01111; font-weight: 600; font-size: 12px; padding: 4px 12px; border-radius: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+    h2 { margin: 16px 0 8px; color: #ce1997; }
+    p { color: #b60968; font-size: 18px; margin-bottom: 27px; line-height: 1.7; }
+    .checklist { text-align: left; background: #51afee; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 14px; color: #3c4043; }
+    .checklist label { display: block; margin-bottom: 14px; cursor: pointer; }
+    .checklist input { margin-right: 10px; accent-color: #e01111; }
+    button { background: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; }
+    button:disabled { background: #4705e2; cursor: not-allowed; }
+    button:hover:not(:disabled) { background: #e74b58; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <span class="badge">closing out a broadcasting</span>
+  <h2>Expanded Workstation Desk Planner</h2>
+  <a href="index3.html">BACK</a>
+  <p>"Core features locked, integrations talking nicely, and the layout engine is behave-ing. Ready for sign-off!.</p>
+
+  <div class="checklist">
+    <label><input type="checkbox" onchange="checkStatus()"> Stakeholder Sign-Off Received</label>
+    <label><input type="checkbox" onchange="checkStatus()"> Production Deployment Verified</label>
+    <label><input type="checkbox" onchange="checkStatus()"> Handover Docs & Runbook Shared</label>
+     <label><input type="checkbox" onchange="checkStatus()">Product Manager / Owner</label>
+      <label><input type="checkbox" onchange="checkStatus()"> Deployment Lead / Release Manager</label>
+       <label><input type="checkbox" onchange="checkStatus()">IT Service Desk Lead</label>
+         <label><input type="checkbox" onchange="checkStatus()">Business Change / Enablement Lead</label>
+           <label><input type="checkbox" onchange="checkStatus()">QA / Testing Lead</label>
+             <label><input type="checkbox" onchange="checkStatus()">Information Security (InfoSec)</label>
+  </div>
+
+  <button id="signOffBtn" disabled onclick="celebrate()">Formal Sign-Off </button>
+</div>
+
+<!-- Canvas Confetti Library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+  function checkStatus() {
+    const checkedBoxes = document.querySelectorAll('.checklist input:checked');
+    const btn = document.getElementById('signOffBtn');
+    // Enable button only when all items are checked
+    btn.disabled = checkedBoxes.length !== 3;
+  }
+
+  function celebrate() {
+    const btn = document.getElementById('signOffBtn');
+    btn.innerText = "Project Signed Off! 🚀";
+    btn.style.background = "#137333";
+    btn.disabled = true;
+
+    // Trigger confetti stream
+    confetti({
+      particleCount: 120,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enable users to scan for Collaborator</title>
+</head>
+<body>
+    <style>
+      .roster{
+        text-align: center;
+        font-size: medium;
+        color: red;
+        }
+        #branches{
+            text-align: center;
+        }
+        .in{
+           background-color: #e2f0d9;
+      border-color: #a9d18e;
+      color: #385723;
+        }
+
+    </style>
+   <div class="roster">
+    <h2>Scan for a Collaborators</h2>
+    <a href="index4.html">Closing out a broadcasting</a><br><br>
+    <a href="index2.html" class="in">BACK</a><br>
+    
+
+    
+    <div class="search-box">
+        <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Search  Colleague by name"
+            autocomplete="off"
+        >
+        <select id="branches" class="filter">
+                <option value="all">All braches</option>
+                <option value="product">Product</option>
+                <option value="engineering">Engineering</option>
+                <option value="marketing">Marketing</option>
+                <option value="docter">doctor</option>
+                <option value="teacher">teaching</option>
+                <option value="web developer">web developer</option>
+                 <option value="Administration">Administration</option>
+                 <option value="Research & Development (R&D)">Research & Development (R&D)</option>
+                 <option value="Operations / Production">Operations / Production</option>
+                 <option value="Customer Service">Customer Service</option>
+
+            </select>
+        </div>
+    </div> 
+    <script>
+        function getColleagueStatus(colleague) {
+  if (colleague.isIn) {
+    return "Yes";
+  } else {
+    // If they aren't in, we grab their reason (defaulting to 'not specified' if empty)
+    const reason = colleague.reason || "not specified";
+    return `No (Reason: ${reason})`;
+  }
+}
+
+// --- Test Cases ---
+
+const colleagues = 
+  { name: "Sarah", isIn: true
+    </script>
+</body>
+</html>
